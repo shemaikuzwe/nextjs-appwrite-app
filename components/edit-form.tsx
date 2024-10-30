@@ -3,8 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-
-import Link from "next/link";
 import { editProduct } from "@/lib/action";
 import { Product } from "@/lib/types";
 

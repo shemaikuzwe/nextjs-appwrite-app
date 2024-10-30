@@ -1,4 +1,4 @@
-import { ID, Models } from "node-appwrite";
+import { Models } from "node-appwrite";
 
 export interface Product extends Models.Document {
   name: string;

@@ -9,18 +9,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Logout from "@/components/logout";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { EllipsisVertical } from "lucide-react";
 import Products from "@/components/products";
 import { Product } from "@/lib/types";
+import React from "react";
 
 export default async function Layout({
   children,
