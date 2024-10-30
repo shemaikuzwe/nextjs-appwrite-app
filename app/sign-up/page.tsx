@@ -1,11 +1,9 @@
-import LoginForm from "@/components/login-form";
 import SignUpForm from "@/components/signup-form";
 
-export default async function page(){
-    return (
-        <div className={"h-screen w-full flex justify-center items-center"}>
-            <SignUpForm/>
-
-        </div>
-    )
+export default async function page() {
+  return (
+    <div className={"h-screen w-full flex justify-center items-center"}>
+      <SignUpForm />
+    </div>
+  );
 }

@@ -68,7 +68,7 @@ export async function getLoggedInUser() {
     const { account } = await createSessionClient();
     return await account.get();
   } catch (e) {
-    return null;
+    throw e;
   }
 }
 export async function addProduct(formData: FormData) {
