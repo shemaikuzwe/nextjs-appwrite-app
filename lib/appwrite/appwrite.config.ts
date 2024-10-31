@@ -1,11 +1,18 @@
-import { Account, Client, Databases } from "node-appwrite";
+import {
+  Account,
+  Client,
+  Databases,
+  Messaging,
+  Users,
+  Storage,
+} from "node-appwrite";
 import { cookies } from "next/headers";
 
 export const {
   PROJECT_ID,
   API_ENDPOINT,
   API_SECRET,
-  DATABSE_ID,
+  DATABASE_ID,
   COLLECTION_ID,
 } = process.env;
 
@@ -38,8 +45,17 @@ export async function createAdminClient() {
     get account() {
       return new Account(client);
     },
+    get message() {
+      return new Messaging(client);
+    },
+    get users() {
+      return new Users(client);
+    },
+    get database() {
+      return new Databases(client);
+    },
+    get storage() {
+      return new Storage(client);
+    },
   };
 }
-
-const client = new Client().setProject(PROJECT_ID!).setEndpoint(API_ENDPOINT!);
-export const database = new Databases(client);

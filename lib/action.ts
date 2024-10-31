@@ -9,7 +9,10 @@ import {
 import { cookies } from "next/headers";
 import { db } from "@/lib/appwrite/database";
 import { revalidatePath } from "next/cache";
-const { account } = await createAdminClient();
+
+const { account, storage, message, users } = await createAdminClient();
+
+const BUCKET_ID = process.env.BUCKET_ID;
 
 export async function authenticate(formData: FormData) {
   const email = formData.get("email") as string;
@@ -74,10 +77,16 @@ export async function getLoggedInUser() {
 export async function addProduct(formData: FormData) {
   const name = formData.get("name") as string;
   const price = Number(formData.get("price"));
+  const imageUpload = formData.get("image") as File;
   try {
-    await db.products.create({ name, price });
-    revalidatePath("/dashboard");
-    // redirect("/dashboard");
+    const image = await uploadImage(imageUpload);
+    await db.products.create({ name, price, image });
+
+    // const content = `Hi from Appwrite New product added ${name} With price: ${price.toLocaleString()} Rwf And discount: 10% For first 100
+    //  Buyers.
+    // `;
+    // await sendSMSNotification(content);
+    // revalidatePath("/dashboard");
   } catch (e) {
     throw e;
   }
@@ -101,5 +110,35 @@ export async function deleteProduct(formData: FormData) {
     revalidatePath("/dashboard");
   } catch (e) {
     throw e;
+  }
+}
+export async function sendSMSNotification(content: string) {
+  try {
+    const users = await getUsers();
+    const newMessage = await message.createSms(ID.unique(), content, [], users);
+  } catch (e) {
+    console.log(e);
+  }
+}
+async function getUsers() {
+  try {
+    const user = await users.list();
+    return user.users.map((user) => user.$id);
+  } catch (err) {
+    console.log(err);
+  }
+}
+async function uploadImage(file: File) {
+  try {
+    const image = await storage.createFile(BUCKET_ID!, ID.unique(), file);
+    return image.$id;
+  } catch (e) {
+    console.log(e);
+  }
+}
+export async function getFile(id: string) {
+  try {
+  } catch (e) {
+    console.log(e);
   }
 }

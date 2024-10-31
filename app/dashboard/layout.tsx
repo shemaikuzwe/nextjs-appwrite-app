@@ -21,8 +21,12 @@ export default async function Layout({
   const user = await getLoggedInUser();
   const products = await db.products.list();
   return (
-    <div className={"h-screen w-full pt-10 px-5 flex gap-5 flex-between"}>
-      <div className={"flex justify-start items-start  "}>
+    <div
+      className={
+        "h-screen w-full pt-10 px-5 flex gap-5 flex-between ax-md:flex-row"
+      }
+    >
+      <div className={"flex justify-start items-start "}>
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar>

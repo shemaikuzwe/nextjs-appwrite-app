@@ -1,14 +1,30 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { addProduct } from "@/lib/action";
+import ImageUpload from "@/components/image-upload";
+import React, { useState } from "react";
 
 // const Icons = {
 //   spinner: Loader2,
 // };
 
 export default function AddProduct() {
+  const [image, setImage] = useState<string | null>(null);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+    if (!fileList) return;
+    const file = fileList[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e) {
+        setImage(e.target?.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
   return (
     <div className="flex items-center justify-center">
       <Card className="w-[350px]">
@@ -40,7 +56,13 @@ export default function AddProduct() {
                 name="price"
               />
             </div>
-
+            <ImageUpload
+              label={image ? "Change Image" : "Upload Image "}
+              image={image}
+              onChange={handleFileChange}
+              name={"image"}
+              id={"image"}
+            />
             <div className={"flex justify-center items-center"}>
               <Button>Add Product</Button>
             </div>

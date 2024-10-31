@@ -39,6 +39,7 @@ export default function Products({ products }: { products: Product[] }) {
               <TableCell className="font-medium">{doc.name}</TableCell>
               <TableCell>{doc.price.toLocaleString()} Rwf</TableCell>
               <TableCell>{new Date(doc.$createdAt).toLocaleString()}</TableCell>
+
               <TableCell className="text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger>

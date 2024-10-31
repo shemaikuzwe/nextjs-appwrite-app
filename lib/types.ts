@@ -3,11 +3,13 @@ import { Models } from "node-appwrite";
 export interface Product extends Models.Document {
   name: string;
   price: number;
+  image: string;
 }
 
 interface Prod {
   name?: string;
   price?: number;
+  image?: string;
 }
 export type Db = {
   create: (payload: Prod, id?: string) => Promise<void>;
