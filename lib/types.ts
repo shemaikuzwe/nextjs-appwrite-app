@@ -18,3 +18,21 @@ export type Db = {
   list: () => Promise<Models.DocumentList<Models.Document>>;
   get: (id: string) => Promise<Models.Document>;
 };
+
+export type LoginState = {
+  errors?: {
+    email?: string[];
+    password?: string[];
+  };
+  message?: string;
+};
+
+export type SignupState = {
+  errors?: {
+    name?: string[];
+    email?: string[];
+    phone?: string[];
+    password?: string[];
+  };
+  message?: string;
+};

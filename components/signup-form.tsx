@@ -14,13 +14,10 @@ import {
 
 import Link from "next/link";
 import { signUp } from "@/lib/action";
-// import Google from "./google";
-// import Link from "next/link";
-// const Icons = {
-//     spinner: Loader2,
-// };
+import { useActionState } from "react";
 
 export default function SignUpForm() {
+  const [state, action, isPending] = useActionState(signUp, undefined);
   return (
     <div className="flex items-center justify-center">
       <Card className="w-[350px]">
@@ -33,7 +30,12 @@ export default function SignUpForm() {
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <form action={signUp}>
+          <form action={action}>
+            {state?.message && (
+              <span className={"mb-2 text-red-400 text-sm"}>
+                {state.message}
+              </span>
+            )}
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -45,6 +47,12 @@ export default function SignUpForm() {
                 autoCorrect="off"
               />
             </div>
+            {state?.errors?.email &&
+              state.errors.email.map((error) => (
+                <span className={"mb-2 text-red-400 text-sm"} key={error}>
+                  {error}
+                </span>
+              ))}
             <div className="grid gap-2">
               <Label htmlFor="name">Name</Label>
               <Input
@@ -56,11 +64,29 @@ export default function SignUpForm() {
                 autoCorrect="off"
               />
             </div>
-            <div className="flex justify-end items-end ">
-              <Button variant={"link"} asChild>
-                <Link href={"/auth/forgot-password"}> forgot password?</Link>
-              </Button>
+            {state?.errors?.name &&
+              state.errors.name.map((error) => (
+                <span className={"mb-2 text-red-400 text-sm"} key={error}>
+                  {error}
+                </span>
+              ))}
+            <div className="grid gap-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                type="text"
+                placeholder="Enter phone number +250"
+                autoCapitalize="none"
+                name="phone"
+                autoCorrect="off"
+              />
             </div>
+            {state?.errors?.phone &&
+              state.errors.phone.map((error) => (
+                <span className={"mb-2 text-red-400 text-sm"} key={error}>
+                  {error}
+                </span>
+              ))}
             <div className="grid gap-2 mt-2 mb-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -70,9 +96,18 @@ export default function SignUpForm() {
                 name="password"
               />
             </div>
-
+            {state?.errors?.password &&
+              state.errors.password.map((error) => (
+                <span className={"mb-2 text-red-400 text-sm"} key={error}>
+                  {error}
+                </span>
+              ))}
             <div className={"flex justify-center items-center"}>
-              <Button>Login</Button>
+              <Button
+                className={`${isPending ? "cursor-not-allowed opacity-10" : ""}`}
+              >
+                {isPending ? "Signing up" : "Signup"}
+              </Button>
             </div>
           </form>
           <div className="relative">

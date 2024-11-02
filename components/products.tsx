@@ -19,8 +19,11 @@ import { EllipsisVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { deleteProduct } from "@/lib/action";
+import Image from "next/image";
 
 export default function Products({ products }: { products: Product[] }) {
+  const PROJECT_ID = process.env.PROJECT_ID as string;
+  const BUCKET_ID = process.env.BUCKET_ID as string;
   return (
     <Table>
       <TableCaption>A list of your products.</TableCaption>
@@ -38,8 +41,15 @@ export default function Products({ products }: { products: Product[] }) {
             <TableRow key={doc.$id}>
               <TableCell className="font-medium">{doc.name}</TableCell>
               <TableCell>{doc.price.toLocaleString()} Rwf</TableCell>
+              <TableCell>
+                <Image
+                  src={`https://cloud.appwrite.io/v1/storage/buckets/${BUCKET_ID}/files/${doc.image}/view?project=${PROJECT_ID}`}
+                  width={50}
+                  height={50}
+                  alt={doc.name}
+                />
+              </TableCell>
               <TableCell>{new Date(doc.$createdAt).toLocaleString()}</TableCell>
-
               <TableCell className="text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger>

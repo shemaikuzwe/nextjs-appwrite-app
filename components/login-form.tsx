@@ -11,16 +11,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
+import { useActionState } from "react";
 import Link from "next/link";
 import { authenticate } from "@/lib/action";
-// import Google from "./google";
-// import Link from "next/link";
-// const Icons = {
-//     spinner: Loader2,
-// };
+import Email from "@/components/email";
 
 export default function LoginForm() {
+  const [state, action, isPending] = useActionState(authenticate, undefined);
   return (
     <div className="flex items-center justify-center">
       <Card className="w-[350px]">
@@ -33,7 +30,12 @@ export default function LoginForm() {
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <form action={authenticate}>
+          <form action={action}>
+            {state?.message && (
+              <span className={"mb-2 text-red-400 text-sm"}>
+                {state.message}
+              </span>
+            )}
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -45,6 +47,12 @@ export default function LoginForm() {
                 autoCorrect="off"
               />
             </div>
+            {state?.errors?.email &&
+              state.errors.email.map((error) => (
+                <span className={"mb-2 text-red-400 text-sm"} key={error}>
+                  {error}
+                </span>
+              ))}
             <div className="flex justify-end items-end ">
               <Button variant={"link"} asChild>
                 <Link href={"/auth/forgot-password"}> forgot password?</Link>
@@ -59,9 +67,18 @@ export default function LoginForm() {
                 name="password"
               />
             </div>
-
+            {state?.errors?.password &&
+              state.errors.password.map((error) => (
+                <span className={"mb-2 text-red-400 text-sm"} key={error}>
+                  {error}
+                </span>
+              ))}
             <div className={"flex justify-center items-center"}>
-              <Button>Login</Button>
+              <Button
+                className={`${isPending ? "cursor-not-allowed opacity-10" : ""}`}
+              >
+                {isPending ? "Logging in" : "Login"}
+              </Button>
             </div>
           </form>
           <div className="relative">
@@ -74,6 +91,7 @@ export default function LoginForm() {
               </span>
             </div>
           </div>
+          <Email />
         </CardContent>
         <CardFooter>
           <p className="text-sm text-center text-gray-600 mt-2">

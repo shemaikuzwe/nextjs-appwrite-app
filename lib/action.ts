@@ -1,6 +1,6 @@
 "use server";
 
-import { ID } from "node-appwrite";
+import { AppwriteException, ID, OAuthProvider } from "node-appwrite";
 import { redirect } from "next/navigation";
 import {
   createAdminClient,
@@ -9,14 +9,29 @@ import {
 import { cookies } from "next/headers";
 import { db } from "@/lib/appwrite/database";
 import { revalidatePath } from "next/cache";
+import { LoginState, SignupState } from "@/lib/types";
+import { LoginSchema, SignupSchema } from "@/lib/schema";
 
-const { account, storage, message, users } = await createAdminClient();
+const { storage, message, users } = await createAdminClient();
 
 const BUCKET_ID = process.env.BUCKET_ID;
 
-export async function authenticate(formData: FormData) {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+export async function authenticate(
+  prevState: LoginState | undefined,
+  formData: FormData,
+): Promise<LoginState | undefined> {
+  const validate = LoginSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
+  if (!validate.success) {
+    return {
+      errors: validate.error.flatten().fieldErrors,
+    };
+  }
+  const { email, password } = validate.data;
+
+  const { account } = await createAdminClient();
   try {
     const session = await account.createEmailPasswordSession(email, password);
     await cookies().then((cookie) =>
@@ -29,17 +44,41 @@ export async function authenticate(formData: FormData) {
       }),
     );
     redirect("/dashboard");
-  } catch (e) {
-    console.log(e);
-    throw e;
+  } catch (err) {
+    if (err instanceof AppwriteException) {
+      switch (err.code) {
+        case 400:
+          return { message: "Invalid credentials" };
+        case 401:
+          return { message: "Invalid credentials" };
+        default: {
+          return { message: "Something went wrong" };
+        }
+      }
+    }
+    throw err;
   }
 }
-export async function signUp(formData: FormData) {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-  const name = formData.get("name") as string;
+export async function signUp(
+  prevState: SignupState | undefined,
+  formData: FormData,
+): Promise<SignupState | undefined> {
+  const validate = SignupSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+    name: formData.get("name"),
+    phone: formData.get("phone"),
+  });
+  if (!validate.success) {
+    return {
+      errors: validate.error.flatten().fieldErrors,
+    };
+  }
+  const { email, password, name, phone } = validate.data;
   try {
-    await account.create(ID.unique(), email, password, name);
+    const { account } = await createAdminClient();
+    const user = await account.create(ID.unique(), email, password, name);
+    // await account.updatePrefs(user.$id);
     const session = await account.createEmailPasswordSession(email, password);
     await cookies().then((cookie) =>
       cookie.set("session", session.secret, {
@@ -52,6 +91,12 @@ export async function signUp(formData: FormData) {
     );
     redirect("/dashboard");
   } catch (e) {
+    if (e instanceof AppwriteException) {
+      switch (e.code) {
+        case 409:
+          return { message: "Email already exists" };
+      }
+    }
     console.log(e);
     throw e;
   }
@@ -69,9 +114,12 @@ export async function signOut() {
 export async function getLoggedInUser() {
   try {
     const { account } = await createSessionClient();
-    return await account.get();
+    if (await account.get()) {
+      return await account.get();
+    }
+    return null;
   } catch (e) {
-    throw e;
+    return null;
   }
 }
 export async function addProduct(formData: FormData) {
@@ -86,7 +134,7 @@ export async function addProduct(formData: FormData) {
     //  Buyers.
     // `;
     // await sendSMSNotification(content);
-    // revalidatePath("/dashboard");
+    revalidatePath("/dashboard");
   } catch (e) {
     throw e;
   }
@@ -136,9 +184,8 @@ async function uploadImage(file: File) {
     console.log(e);
   }
 }
-export async function getFile(id: string) {
-  try {
-  } catch (e) {
-    console.log(e);
-  }
-}
+export const sendEmail = async (formData: FormData) => {
+  const { account } = await createAdminClient();
+  const email = formData.get("email") as string;
+  await account.createMagicURLToken(ID.unique(), email);
+};

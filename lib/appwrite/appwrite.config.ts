@@ -14,6 +14,7 @@ export const {
   API_SECRET,
   DATABASE_ID,
   COLLECTION_ID,
+  BUCKET_ID,
 } = process.env;
 
 export async function createSessionClient() {

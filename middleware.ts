@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getLoggedInUser } from "@/lib/action";
 
-export default async function mileware(req: NextRequest) {
+export default async function middleware(req: NextRequest) {
   const isOnDashbaord = req.nextUrl.pathname.startsWith("/dashboard");
   const isOnLogin = req.nextUrl.pathname === "/";
   const isOnSignup = req.nextUrl.pathname === "/sign-up";

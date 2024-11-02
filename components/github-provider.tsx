@@ -1,0 +1,32 @@
+import { Github } from "lucide-react";
+import { Account, OAuthProvider, Client } from "node-appwrite";
+import { createSessionClient } from "@/lib/appwrite/appwrite.config";
+const client = new Client()
+  .setEndpoint("https://cloud.appwrite.io/v1") // Your API Endpoint
+  .setProject("67209a4e00093f6ad7c0"); // Your project ID
+
+const account = new Account(client);
+export default function GithubProvider() {
+  const handleClick = async () => {
+    try {
+      const session = await account.createOAuth2Session(
+        OAuthProvider.Github,
+        "http://localhost:3000/dashboard", // Success URL
+        "http://localhost:3000", // Failure URL
+      );
+
+      console.log(session);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return (
+    <div
+      className="flex bg-accent px-4 py-1.5 rounded-md gap-2 w-full cursor-pointer"
+      onClick={handleClick}
+    >
+      <Github />
+      <span className={"text-md"}>Continue With Github</span>
+    </div>
+  );
+}
