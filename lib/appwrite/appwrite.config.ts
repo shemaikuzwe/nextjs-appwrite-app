@@ -21,7 +21,6 @@ export async function createSessionClient() {
   const client = new Client()
     .setProject(PROJECT_ID!)
     .setEndpoint(API_ENDPOINT!);
-
   const session = cookies().then((result) => result.get("session"));
   if (!session || !session.then((session) => session?.value)) {
     throw new Error("Session not found");
@@ -35,6 +34,22 @@ export async function createSessionClient() {
       return new Account(client);
     },
   };
+}
+export async function getSesion(cookies: string) {
+  try {
+    const client = new Client()
+      .setProject(PROJECT_ID!)
+      .setEndpoint(API_ENDPOINT!)
+      .setKey(API_SECRET!);
+    client.headers["Cookie"] = cookies;
+    const account = new Account(client);
+    const session = await account.get();
+    return session;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e.message);
+    }
+  }
 }
 export async function createAdminClient() {
   const client = new Client()

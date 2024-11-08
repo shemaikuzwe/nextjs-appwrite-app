@@ -1,6 +1,12 @@
 "use server";
 
-import { AppwriteException, ID, OAuthProvider } from "node-appwrite";
+import {
+  Account,
+  AppwriteException,
+  Client,
+  ID,
+  OAuthProvider,
+} from "node-appwrite";
 import { redirect } from "next/navigation";
 import {
   createAdminClient,
@@ -189,3 +195,22 @@ export const sendEmail = async (formData: FormData) => {
   const email = formData.get("email") as string;
   await account.createMagicURLToken(ID.unique(), email);
 };
+export async function signInWithGithub() {
+  try {
+    const client = new Client()
+      .setEndpoint("https://cloud.appwrite.io/v1") // Your API Endpoint
+      .setProject("67209a4e00093f6ad7c0"); // Your project ID
+
+    const account = new Account(client);
+    const session = await account.createOAuth2Token(
+      OAuthProvider.Github,
+      "http://localhost:3000/dashboard",
+      "http://localhost:3000",
+    );
+    return session;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e.message);
+    }
+  }
+}

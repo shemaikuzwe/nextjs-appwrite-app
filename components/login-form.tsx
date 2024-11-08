@@ -15,6 +15,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { authenticate } from "@/lib/action";
 import Email from "@/components/email";
+import GithubProvider from "@/components/github-provider";
 
 export default function LoginForm() {
   const [state, action, isPending] = useActionState(authenticate, undefined);
@@ -91,7 +92,7 @@ export default function LoginForm() {
               </span>
             </div>
           </div>
-          <Email />
+          {/*<GithubProvider />*/}
         </CardContent>
         <CardFooter>
           <p className="text-sm text-center text-gray-600 mt-2">
