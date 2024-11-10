@@ -92,7 +92,7 @@ export default function LoginForm() {
               </span>
             </div>
           </div>
-          {/*<GithubProvider />*/}
+          <GithubProvider />
         </CardContent>
         <CardFooter>
           <p className="text-sm text-center text-gray-600 mt-2">

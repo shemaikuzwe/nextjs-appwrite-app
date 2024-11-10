@@ -1,27 +1,17 @@
-import { Button } from "@/components/ui/button";
 import { signInWithGithub } from "@/lib/action";
-import {
-  Account,
-  AppwriteException,
-  Client,
-  ID,
-  OAuthProvider,
-} from "appwrite";
+import { Github } from "lucide-react";
 export default function GithubProvider() {
   const handleClick = async () => {
-    const client = new Client()
-      .setEndpoint("https://cloud.appwrite.io/v1") // Your API Endpoint
-      .setProject("67209a4e00093f6ad7c0");
-    const account = new Account(client);
     try {
-      await account.createOAuth2Session(
-        OAuthProvider.Github,
-        "http://localhost:3000/dashboard",
-        "http://localhost:3000",
-      );
+      await signInWithGithub();
     } catch (error) {
       console.log(error);
     }
   };
-  return <Button onClick={handleClick}>Continue With Github</Button>;
+  return (
+    <div className="flex items-center gap-2 justify-center bg-white rounded-md cursor-pointer  py-2 text-black" onClick={handleClick}>
+      <Github />
+      Continue With Github
+    </div>
+  );
 }

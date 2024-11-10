@@ -1,3 +1,4 @@
+"use server";
 import {
   Account,
   Client,
@@ -7,27 +8,16 @@ import {
   Storage,
 } from "node-appwrite";
 import { cookies } from "next/headers";
-
-export const {
-  PROJECT_ID,
-  API_ENDPOINT,
-  API_SECRET,
-  DATABASE_ID,
-  COLLECTION_ID,
-  BUCKET_ID,
-} = process.env;
-
+import { appwriteConfig } from "./config";
 export async function createSessionClient() {
   const client = new Client()
-    .setProject(PROJECT_ID!)
-    .setEndpoint(API_ENDPOINT!);
-  const session = cookies().then((result) => result.get("session"));
-  if (!session || !session.then((session) => session?.value)) {
+    .setProject(appwriteConfig.projectId)
+    .setEndpoint(appwriteConfig.endpoint);
+  const session = (await cookies()).get("session");
+  if (!session || !session.value) {
     throw new Error("Session not found");
   }
-  const sessionValue = (await session.then(
-    (session) => session?.value,
-  )) as string;
+  const sessionValue = session.value;
   client.setSession(sessionValue);
   return {
     get account() {
@@ -35,27 +25,12 @@ export async function createSessionClient() {
     },
   };
 }
-export async function getSesion(cookies: string) {
-  try {
-    const client = new Client()
-      .setProject(PROJECT_ID!)
-      .setEndpoint(API_ENDPOINT!)
-      .setKey(API_SECRET!);
-    client.headers["Cookie"] = cookies;
-    const account = new Account(client);
-    const session = await account.get();
-    return session;
-  } catch (e) {
-    if (e instanceof Error) {
-      console.log(e.message);
-    }
-  }
-}
+
 export async function createAdminClient() {
   const client = new Client()
-    .setEndpoint(API_ENDPOINT!)
-    .setProject(PROJECT_ID!)
-    .setKey(API_SECRET!);
+    .setEndpoint(appwriteConfig.endpoint)
+    .setProject(appwriteConfig.projectId)
+    .setKey(appwriteConfig.apiKey);
 
   return {
     get account() {

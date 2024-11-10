@@ -1,18 +1,17 @@
 import {
-  DATABASE_ID,
-  COLLECTION_ID,
   createAdminClient,
 } from "@/lib/appwrite/appwrite.config";
 import { ID } from "node-appwrite";
 import { Db } from "@/lib/types";
+import { appwriteConfig } from "./config";
 
 const { database } = await createAdminClient();
 const db: Record<string, Db> = {};
 
 const collection = [
   {
-    dbId: DATABASE_ID!,
-    id: COLLECTION_ID!,
+    dbId: appwriteConfig.databaseId,
+    id: appwriteConfig.collectionId,
     name: "products",
   },
 ];

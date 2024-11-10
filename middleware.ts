@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getLoggedInUser } from "@/lib/action";
-import { getSesion } from "@/lib/appwrite/appwrite.config";
-
 export default async function middleware(req: NextRequest) {
   const isOnDashbaord = req.nextUrl.pathname.startsWith("/dashboard");
   const isOnLogin = req.nextUrl.pathname === "/";
   const isOnSignup = req.nextUrl.pathname === "/sign-up";
-
-  // const cookies = req.headers.get("cookie") || "";
-  // const user = await getSesion(cookies);
   const user = await getLoggedInUser();
   if (!user) {
     if (isOnDashbaord) {

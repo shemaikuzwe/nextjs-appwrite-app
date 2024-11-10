@@ -1,12 +1,6 @@
 "use server";
 
-import {
-  Account,
-  AppwriteException,
-  Client,
-  ID,
-  OAuthProvider,
-} from "node-appwrite";
+import { AppwriteException, ID, OAuthProvider } from "node-appwrite";
 import { redirect } from "next/navigation";
 import {
   createAdminClient,
@@ -17,10 +11,9 @@ import { db } from "@/lib/appwrite/database";
 import { revalidatePath } from "next/cache";
 import { LoginState, SignupState } from "@/lib/types";
 import { LoginSchema, SignupSchema } from "@/lib/schema";
+import { appwriteConfig } from "./appwrite/config";
 
 const { storage, message, users } = await createAdminClient();
-
-const BUCKET_ID = process.env.BUCKET_ID;
 
 export async function authenticate(
   prevState: LoginState | undefined,
@@ -37,18 +30,16 @@ export async function authenticate(
   }
   const { email, password } = validate.data;
 
-  const { account } = await createAdminClient();
   try {
+    const { account } = await createAdminClient();
     const session = await account.createEmailPasswordSession(email, password);
-    await cookies().then((cookie) =>
-      cookie.set("session", session.secret, {
-        path: "/",
-        httpOnly: true,
-        sameSite: "strict",
-        expires: new Date(session.expire),
-        secure: process.env.NODE_ENV === "production",
-      }),
-    );
+    (await cookies()).set("session", session.secret, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      expires: new Date(session.expire),
+      secure: process.env.NODE_ENV === "production",
+    });
     redirect("/dashboard");
   } catch (err) {
     if (err instanceof AppwriteException) {
@@ -86,15 +77,13 @@ export async function signUp(
     const user = await account.create(ID.unique(), email, password, name);
     // await account.updatePrefs(user.$id);
     const session = await account.createEmailPasswordSession(email, password);
-    await cookies().then((cookie) =>
-      cookie.set("session", session.secret, {
-        path: "/",
-        httpOnly: true,
-        sameSite: "strict",
-        secure: process.env.NODE_ENV === "production",
-        expires: new Date(session.expire),
-      }),
-    );
+    (await cookies()).set("session", session.secret, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      expires: new Date(session.expire),
+    });
     redirect("/dashboard");
   } catch (e) {
     if (e instanceof AppwriteException) {
@@ -125,6 +114,8 @@ export async function getLoggedInUser() {
     }
     return null;
   } catch (e) {
+    console.log(e);
+
     return null;
   }
 }
@@ -170,6 +161,7 @@ export async function sendSMSNotification(content: string) {
   try {
     const users = await getUsers();
     const newMessage = await message.createSms(ID.unique(), content, [], users);
+    return newMessage;
   } catch (e) {
     console.log(e);
   }
@@ -184,33 +176,34 @@ async function getUsers() {
 }
 async function uploadImage(file: File) {
   try {
-    const image = await storage.createFile(BUCKET_ID!, ID.unique(), file);
+    const image = await storage.createFile(
+      appwriteConfig.bucketId,
+      ID.unique(),
+      file,
+    );
     return image.$id;
   } catch (e) {
     console.log(e);
   }
 }
 export const sendEmail = async (formData: FormData) => {
-  const { account } = await createAdminClient();
   const email = formData.get("email") as string;
+  const { account } = await createAdminClient();
   await account.createMagicURLToken(ID.unique(), email);
 };
 export async function signInWithGithub() {
+  const { account } = await createAdminClient();
   try {
-    const client = new Client()
-      .setEndpoint("https://cloud.appwrite.io/v1") // Your API Endpoint
-      .setProject("67209a4e00093f6ad7c0"); // Your project ID
-
-    const account = new Account(client);
     const session = await account.createOAuth2Token(
       OAuthProvider.Github,
-      "http://localhost:3000/dashboard",
-      "http://localhost:3000",
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}`,
     );
-    return session;
+    redirect(session);
   } catch (e) {
     if (e instanceof Error) {
       console.log(e.message);
     }
+    throw e;
   }
 }

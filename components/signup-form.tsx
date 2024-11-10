@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import { signUp } from "@/lib/action";
 import { useActionState } from "react";
+import GithubProvider from "./github-provider";
 
 export default function SignUpForm() {
   const [state, action, isPending] = useActionState(signUp, undefined);
@@ -119,7 +120,9 @@ export default function SignUpForm() {
                 Or continue with
               </span>
             </div>
+
           </div>
+          <GithubProvider/>
         </CardContent>
         <CardFooter>
           <p className="text-sm text-center text-gray-600 mt-2">
