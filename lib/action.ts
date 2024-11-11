@@ -12,6 +12,7 @@ import { revalidatePath } from "next/cache";
 import { LoginState, SignupState } from "@/lib/types";
 import { LoginSchema, SignupSchema } from "@/lib/schema";
 import { appwriteConfig } from "./appwrite/config";
+import { log } from "node:util";
 
 const { storage, message, users } = await createAdminClient();
 
@@ -166,7 +167,7 @@ export async function sendSMSNotification(content: string) {
     console.log(e);
   }
 }
-async function getUsers() {
+export async function getUsers() {
   try {
     const user = await users.list();
     return user.users.map((user) => user.$id);
@@ -188,8 +189,44 @@ async function uploadImage(file: File) {
 }
 export const sendEmail = async (formData: FormData) => {
   const email = formData.get("email") as string;
+  if (!email) return;
   const { account } = await createAdminClient();
-  await account.createMagicURLToken(ID.unique(), email);
+  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth`;
+  try {
+    await account.createMagicURLToken(ID.unique(), email, url);
+  } catch (e) {
+    console.log(e);
+  }
+};
+export const sendForgotPassword = async (formData: FormData) => {
+  const email = formData.get("email") as string;
+  if (!email) return;
+  const { account } = await createAdminClient();
+  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/change-password`;
+  try {
+    await account.createRecovery(email, url);
+  } catch (e) {
+    console.log(e);
+  }
+};
+export const updateRecovery = async (
+  formData: FormData,
+  userId: string,
+  secret: string,
+) => {
+  const { account } = await createAdminClient();
+  const password = formData.get("new-password") as string;
+  const confirmPassword = formData.get("confirm-password") as string;
+  if (confirmPassword != password) {
+    throw new Error("Password don't match");
+  }
+  try {
+    await account.updateRecovery(userId, secret, password);
+    redirect("/");
+  } catch (e) {
+    console.log(e);
+    throw e;
+  }
 };
 export async function signInWithGithub() {
   const { account } = await createAdminClient();

@@ -1,11 +1,11 @@
 import { Input } from "@/components/ui/input";
-import { sendEmail } from "@/lib/action";
+import { sendForgotPassword } from "@/lib/action";
 import { Button } from "@/components/ui/button";
 
-export default function Email() {
+export default function ForgotPassword() {
   return (
     <form
-      action={sendEmail}
+      action={sendForgotPassword}
       className={"flex justify-center items-center flex-col gap-2"}
     >
       <Input type={"email"} placeholder={"Enter Email"} name={"email"} />

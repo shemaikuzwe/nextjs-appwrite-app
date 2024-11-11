@@ -5,7 +5,6 @@ export interface Product extends Models.Document {
   price: number;
   image: string;
 }
-
 interface Prod {
   name?: string;
   price?: number;
@@ -35,4 +34,9 @@ export type SignupState = {
     password?: string[];
   };
   message?: string;
+};
+
+export type TLink = {
+  name: "products" | "users";
+  href: "/dashboard" | "/dashboard/users";
 };

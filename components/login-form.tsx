@@ -56,7 +56,7 @@ export default function LoginForm() {
               ))}
             <div className="flex justify-end items-end ">
               <Button variant={"link"} asChild>
-                <Link href={"/auth/forgot-password"}> forgot password?</Link>
+                <Link href={"/forgot-password"}> forgot password?</Link>
               </Button>
             </div>
             <div className="grid gap-2 mt-2 mb-2">
@@ -93,6 +93,7 @@ export default function LoginForm() {
             </div>
           </div>
           <GithubProvider />
+          <Email />
         </CardContent>
         <CardFooter>
           <p className="text-sm text-center text-gray-600 mt-2">
