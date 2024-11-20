@@ -14,14 +14,20 @@ export default async function Page({
   searchParams: Promise<{ userId: string; secret: string; expire: Date }>;
 }) {
   const { userId, secret, expire } = await searchParams;
+
   if (!userId || !secret) {
     return notFound();
   }
+
   const now = new Date();
-  const expired = new Date(expire);
-  if (now < expired) {
-    throw new Error("Link expired");
-  }
+  const expiredDate = new Date(expire);
+  console.log("now",now);
+   console.log("expired date",expiredDate);
+   
+  // if (now > expiredDate) {
+  //   throw new Error("Link expired");
+  // }
+
   return (
     <div className="flex items-center justify-center mt-20">
       <Card className="w-[350px]">

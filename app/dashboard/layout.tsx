@@ -1,6 +1,6 @@
 import { getLoggedInUser } from "@/lib/action";
 import { db } from "@/lib/appwrite/database";
-
+import Navbar from "@/components/navbar";
 import Products from "@/components/products";
 import { Product } from "@/lib/types";
 import React from "react";

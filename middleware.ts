@@ -3,7 +3,7 @@ import { getLoggedInUser } from "@/lib/action";
 export default async function middleware(req: NextRequest) {
   const isOnDashbaord = req.nextUrl.pathname.startsWith("/dashboard");
   const isOnLogin = req.nextUrl.pathname === "/";
-  const isOnSignup = req.nextUrl.pathname === "/sign-up";
+  const isOnSignup = req.nextUrl.pathname === "/sign-up";  
   const user = await getLoggedInUser();
   if (!user) {
     if (isOnDashbaord) {

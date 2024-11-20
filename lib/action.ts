@@ -12,7 +12,6 @@ import { revalidatePath } from "next/cache";
 import { LoginState, SignupState } from "@/lib/types";
 import { LoginSchema, SignupSchema } from "@/lib/schema";
 import { appwriteConfig } from "./appwrite/config";
-import { log } from "node:util";
 
 const { storage, message, users } = await createAdminClient();
 
@@ -57,6 +56,49 @@ export async function authenticate(
     throw err;
   }
 }
+// export async function createAuthSession(){
+//    const session=  (await cookies()).set("hh","super=secret",{
+//       path:"/",
+//       sameSite:"strict",
+//       secure:false,
+//       httpOnly:true
+//      } )
+//      if(session){
+//       console.log("session created");
+      
+//      }
+//   // const { account } = await createAdminClient();
+//   // try {
+//   //   const session = await account.createSession(
+//   //     userId ,
+//   //     secret,
+//   //   );
+//   //   const setSession = (await cookies()).set("session", session.secret, {
+//   //     path: "/",
+//   //     httpOnly: true,
+//   //     sameSite: "strict",
+//   //     secure: process.env.NODE_ENV === "production",
+//   //     expires: new Date(session.expire),
+//   //   });
+//   //   if (!setSession.has("session")) {
+//   //     console.log("sessionss not set");
+//   //   }
+//   //   return  redirect("/dashboard")
+//   // } catch (err) {
+//   //   if (err instanceof AppwriteException) {
+//   //     switch (err.code) {
+//   //       case 401:
+        
+//   //       case 404:
+         
+//   //       default:
+        
+//   //     }
+//   //   }
+//   //   throw err;
+//   // }
+
+// }
 export async function signUp(
   prevState: SignupState | undefined,
   formData: FormData,
@@ -110,13 +152,22 @@ export async function signOut() {
 export async function getLoggedInUser() {
   try {
     const { account } = await createSessionClient();
-    if (await account.get()) {
-      return await account.get();
+    const session = (await cookies()).get('session');
+    
+    if (!session) {
+      return null;
     }
-    return null;
-  } catch (e) {
-    console.log(e);
 
+    const user = await account.get();
+    return user;
+  } catch (e) {
+    // Specific error handling
+    if (e instanceof AppwriteException && 
+        (e.code === 401 || e.code === 404)) {
+      // Invalid or expired session
+      return null;
+    }
+    console.log(e);
     return null;
   }
 }
@@ -214,7 +265,7 @@ export const updateRecovery = async (
   userId: string,
   secret: string,
 ) => {
-  const { account } = await createAdminClient();
+  const { account } = await createAdminClient();  
   const password = formData.get("new-password") as string;
   const confirmPassword = formData.get("confirm-password") as string;
   if (confirmPassword != password) {

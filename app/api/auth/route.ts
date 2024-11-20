@@ -3,7 +3,11 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { AppwriteException } from "node-appwrite";
 
+
+export const runtime = "edge";
+
 export async function GET(request: NextRequest) {
+
   const searchParams = request.nextUrl.searchParams;
   const secret = searchParams.get("secret");
   const userId = searchParams.get("userId");
@@ -17,20 +21,14 @@ export async function GET(request: NextRequest) {
       userId as string,
       secret as string,
     );
-    const setSession = (await cookies()).set("session", session.secret, {
+    (await cookies()).set("session", session.secret, {
       path: "/",
       httpOnly: true,
       sameSite: "strict",
       secure: process.env.NODE_ENV === "production",
       expires: new Date(session.expire),
     });
-    if (!setSession.has("session")) {
-      console.log("session not set");
 
-      return NextResponse.redirect(
-        new URL("/?error=session not set", request.nextUrl),
-      );
-    }
     return NextResponse.redirect(new URL("/dashboard", request.nextUrl));
   } catch (err) {
     if (err instanceof AppwriteException) {
@@ -52,3 +50,4 @@ export async function GET(request: NextRequest) {
     throw err;
   }
 }
+

@@ -13,20 +13,32 @@ export async function createSessionClient() {
   const client = new Client()
     .setProject(appwriteConfig.projectId)
     .setEndpoint(appwriteConfig.endpoint);
+
   const session = (await cookies()).get("session");
+
+
   if (!session || !session.value) {
-    throw new Error("Session not found");
+    console.error("No valid session found");
+    throw new Error("Session undefined");
   }
+
   const sessionValue = session.value;
-  client.setSession(sessionValue);
-  return {
-    get account() {
-      return new Account(client);
-    },
-    get users(){
-      return new Users(client)
-    }
-  };
+
+  try {
+    client.setSession(sessionValue);
+    
+    return {
+      get account() {
+        return new Account(client);
+      },
+      get users() {
+        return new Users(client);
+      }
+    };
+  } catch (error) {
+    console.error("Session client creation error:", error);
+    throw error;
+  }
 }
 
 export async function createAdminClient() {
