@@ -4,7 +4,6 @@ import { db } from "@/lib/appwrite/database";
 import Products from "@/components/products";
 import { Product } from "@/lib/types";
 import React from "react";
-import Navbar from "@/components/navbar";
 
 export default async function Layout({
   children,
